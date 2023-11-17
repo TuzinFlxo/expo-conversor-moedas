@@ -1,84 +1,72 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, TextInput, Pressable } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
 import { useState } from 'react';
+import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Picker } from '@react-native-picker/picker';
 
 export default function App() {
   const [moedaOrigem, setMoedaOrigem] = useState('BRL')
   const [moedaDestino, setMoedaDestino] = useState('USD')
-  const [valorOriginal, setValorOriginal] = useState('33.33333')
-  const [valorConvertido, setValorConvertido] = useState ('0')
-  
+  const [valorConvertido, setValorConvertido] = useState('')
+  const [valorOriginal, setValorOriginal] = useState("33.33333")
 
-  const handleConverter = async () => {
-    //https://economia.awesomeapi.com.br/last/USD-BRL
-    let URL = 'https://economia.awesomeapi.com.br/last/${moedaOrigem}-${moedaDestino}'
+  const buscarHandle = async () => {
+    let URL = `https://economia.awesomeapi.com.br/last/${moedaOrigem}-${moedaDestino}`
     try {
-      let page = await fetch(URL);
-      let json = await page.json();
-      console.log(json);
+      let page = await fetch(URL)
+      let json = await page.json()
+      console.log(json)
       let indice = parseFloat(json[`${moedaOrigem}${moedaDestino}`].high)
-      let vlEntrada = parseFloat(valorOriginal)
-      setValorConvertido((indice*vlEntrada).toFixed(2))
-      console.log(indice) 
+      // setValorConvertido(indice)
+      let valor = parseFloat(valorOriginal)
+      setValorConvertido((indice*valor).toFixed(2))
     } catch (error) {
-      setValorConvertido('Erro: ${error.message}')
+      setValorConvertido(`Erro: ${error.message}`)
     }
+    // setValorConvertido(URL);
   }
 
-
-  const handleLimpar = () => {
-    setMoedaOrigem('BRL')
-    setMoedaDestino('USD')
-    setValorOriginal('33.33333')
+  const limparResultado = ()=> {
     setValorConvertido('')
   }
-
-
+  
   return (
     <View style={styles.container}>
+      <Text>Conversor de Moedas - 1o. </Text>
       <View>
-        <Text>Moeda de Origem</Text>
+        <Text>Moeda 1</Text>
         <Picker
+          style={{ height: 50, width: 200 }}
           selectedValue={moedaOrigem}
-          onValueChange={(itemValue, itemIndex) =>
-            setMoedaOrigem(itemValue)
-          }>
+          onValueChange={(itemValue, itemIndex) => setMoedaOrigem(itemValue)}
+        >
           <Picker.Item label="Real Brasileiro" value="BRL" />
-          <Picker.Item label="Euro" value="EUR" />
-          <Picker.Item label="Dólar Canadense" value="CAD" /> 
-          <Picker.Item label="Dólar Americano" value="USD" /> 
+          <Picker.Item label="Dólar Americano" value="USD" />
+          <Picker.Item label="Ouro" value="XAU" />
+          <Picker.Item label="Bitcoin" value="BTC" />
         </Picker>
       </View>
-
-
-
-
-
       <View>
-        <Text>Moeda de Destino</Text>
+        <Text>Moeda 2</Text>
         <Picker
+          style={{ height: 50, width: 200 }}
           selectedValue={moedaDestino}
-          onValueChange={(itemValue, itemIndex) =>
-            setMoedaDestino(itemValue)
-          }>
+          onValueChange={(itemValue, itemIndex) => setMoedaDestino(itemValue)}
+        >
           <Picker.Item label="Real Brasileiro" value="BRL" />
-          <Picker.Item label="Euro" value="EUR" />
-          <Picker.Item label="Dólar Canadense" value="CAD" /> 
-          <Picker.Item label="Dólar Americano" value="USD" /> 
+          <Picker.Item label="Dólar Americano" value="USD" />
+          <Picker.Item label="Ouro" value="XAU" />
+          <Picker.Item label="Bitcoin" value="BTC" />
         </Picker>
       </View>
-      <View><Text>Valor a ser convertido</Text><TextInput 
-      value={valorOriginal} 
-      onChangeText={setValorOriginal} /></View>
       <View>
-        <Pressable onPress={handleConverter}><Text>Converter</Text></Pressable>
-        <Pressable onPress={handleLimpar}><Text>Limpar</Text></Pressable>
+        <TextInput
+            value={valorOriginal}
+            onChangeText={setValorOriginal}
+            keyboardType="numeric"
+       />
       </View>
-      <View>
-        <Text>Resultado </Text>
-        <Text>{valorConvertido}</Text>
-      </View>
+      <Pressable onPress={buscarHandle}><Text>Buscar Valor</Text></Pressable>
+      <Text>{`Resultado: ${valorConvertido}`}</Text>
       <StatusBar style="auto" />
     </View>
   );
